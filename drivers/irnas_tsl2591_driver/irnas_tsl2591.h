@@ -50,8 +50,8 @@
 #define TSL2591_AGAIN_SHIFT 4	 // Bit shift of ALS gain
 
 /* ENABLE mask */
-#define TSL2591_ENABLE_POWEROFF 0x00 // Flag for ENABLE register to disable
-#define TSL2591_ENABLE_POWERON	0x01 // Flag for ENABLE register to enable
+#define TSL2591_ENABLE_POWERON 0x01 // Flag for ENABLE register to enable
+
 #define TSL2591_ENABLE_AEN                                                                         \
 	0x02 // ALS Enable. This field activates ALS function. Writing a one activates the ALS.
 	     // Writing a zero disables the ALS.

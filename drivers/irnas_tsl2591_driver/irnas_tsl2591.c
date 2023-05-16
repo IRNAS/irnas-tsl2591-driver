@@ -83,7 +83,7 @@ static int prv_tsl2591_set_gain(const struct device *dev, enum tsl2591_gain agai
 	return 0;
 }
 
-static int prv_tsl2591_power(const struct device *dev)
+static int prv_tsl2591_power_on(const struct device *dev)
 {
 	const struct tsl2591_config *config = dev->config;
 
@@ -92,8 +92,42 @@ static int prv_tsl2591_power(const struct device *dev)
 		return -ENODEV;
 	}
 
-	if (i2c_reg_write_byte_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
-				  TSL2591_ENABLE_POWERON | TSL2591_ENABLE_AEN) < 0) {
+	if (i2c_reg_update_byte_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
+				   TSL2591_ENABLE_POWERON, 0xff) < 0) {
+		return -EIO;
+	}
+
+	return 0;
+}
+
+static int prv_tsl2591_power_off(const struct device *dev)
+{
+	const struct tsl2591_config *config = dev->config;
+
+	if (!device_is_ready(config->i2c.bus)) {
+		LOG_ERR("I2C bus device not ready");
+		return -ENODEV;
+	}
+
+	if (i2c_reg_update_byte_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
+				   TSL2591_ENABLE_POWERON, 0x00) < 0) {
+		return -EIO;
+	}
+
+	return 0;
+}
+
+static int prv_tsl2591_enable_als(const struct device *dev)
+{
+	const struct tsl2591_config *config = dev->config;
+
+	if (!device_is_ready(config->i2c.bus)) {
+		LOG_ERR("I2C bus device not ready");
+		return -ENODEV;
+	}
+
+	if (i2c_reg_update_byte_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_ENABLE,
+				   TSL2591_ENABLE_AEN, 0xff) < 0) {
 		return -EIO;
 	}
 
@@ -108,6 +142,14 @@ static int tsl2591_sample_fetch(const struct device *dev, enum sensor_channel ch
 	uint8_t ch0[2], ch1[2];
 
 	__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);
+
+	/* Power on */
+	prv_tsl2591_power_on(dev);
+
+	/* Calculate minimum sleep time after power on - we need to sleep for a bit more than
+	 * integration time value*/
+	uint32_t sleep = 100 * config->atime + 110;
+	k_sleep(K_MSEC(sleep));
 
 	if (i2c_burst_read_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN0_LOW, ch0,
 			      2)) {
@@ -126,6 +168,9 @@ static int tsl2591_sample_fetch(const struct device *dev, enum sensor_channel ch
 	data->chan1 = (ch1[1] << 8) + ch1[0];
 
 	LOG_DBG("CH1 lsb: %x msb: %x combined: %d", ch1[0], ch1[1], data->chan1);
+
+	/* Power off */
+	prv_tsl2591_power_off(dev);
 
 	return 0;
 }
@@ -199,8 +244,8 @@ static int tsl2591_init(const struct device *dev)
 		return -EIO;
 	}
 
-	/* Power on */
-	if (prv_tsl2591_power(dev)) {
+	/* Enable ALS */
+	if (prv_tsl2591_enable_als(dev)) {
 		return -EIO;
 	}
 
