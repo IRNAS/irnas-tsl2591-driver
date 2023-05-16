@@ -1,0 +1,42 @@
+description: |
+    TSL2591 Light-to-Digital converter, Irnas driver. See datasheet at
+    https://eu.mouser.com/datasheet/2/588/TSL2591_DS000338_6_00-1623895.pdf
+
+compatible: "irnas,tsl2591"
+
+include: [sensor-device.yaml, i2c-device.yaml]
+
+properties:
+    int-gpios:
+      type: phandle-array
+      required: false
+      description: |
+        The INT pin defaults to active low when produced by the sensor.
+        The property value should ensure the flags properly describe the
+        signal that is presented to the driver.
+
+    gain:
+      type: int
+      required: false
+      default: 1
+      # default of 1 is equivalent to 25x gain 
+      description: gain of the ADC
+      enum:
+        - 0  # Low gain (1x)
+        - 1  # Medium gain (25x)
+        - 2  # High gain (428x)
+        - 3  # Max gain (9876x)
+
+    atime:
+      type: int
+      required: false
+      default: 0
+      # default of 0 is equivalent to 100 ms integration time
+      description: sensor integration timing
+      enum:
+        - 0  # 100 millis
+        - 1  # 200 millis
+        - 2  # 300 millis
+        - 3  # 400 millis
+        - 4  # 500 millis
+        - 5  # 600 millis

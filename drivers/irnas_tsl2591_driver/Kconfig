@@ -1,0 +1,8 @@
+# TSL2591 light sensor configuration options
+
+menuconfig IRNAS_TSL2591
+	bool "TSL2591 light sensor"
+	default y
+	depends on I2C
+	help
+	  Enable driver for the TSL2591 light sensor.
