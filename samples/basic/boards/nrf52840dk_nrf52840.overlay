@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2019 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&i2c0 { 
+	tsl2591: tsl2591@29 {
+		compatible = "irnas,tsl2591";
+		reg = <0x29>;
+		gain = <1>;
+		atime = <0>;
+	};
+};
