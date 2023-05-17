@@ -134,6 +134,26 @@ static int prv_tsl2591_enable_als(const struct device *dev)
 	return 0;
 }
 
+static int prv_tsl2591_dummy_transfer(const struct device *dev)
+{
+	const struct tsl2591_config *config = dev->config;
+
+	if (!device_is_ready(config->i2c.bus)) {
+		LOG_ERR("I2C bus device not ready");
+		return -ENODEV;
+	}
+
+	/* Make test i2c transaction - for some reason first i2c transaction fails */
+	struct i2c_msg msgs[1];
+	uint8_t dst = 1;
+	/* Send the address to read from */
+	msgs[0].buf = &dst;
+	msgs[0].len = 1U;
+	msgs[0].flags = I2C_MSG_WRITE | I2C_MSG_STOP;
+
+	return i2c_transfer_dt(&config->i2c, &msgs[0], 1);
+}
+
 static int tsl2591_sample_fetch(const struct device *dev, enum sensor_channel chan)
 {
 	struct tsl2591_data *data = dev->data;
@@ -210,14 +230,9 @@ static int tsl2591_init(const struct device *dev)
 	data->chan1 = 0U;
 
 	/* Make test i2c transaction - for some reason first i2c transaction fails */
-	struct i2c_msg msgs[1];
-	uint8_t dst = 1;
-	/* Send the address to read from */
-	msgs[0].buf = &dst;
-	msgs[0].len = 1U;
-	msgs[0].flags = I2C_MSG_WRITE | I2C_MSG_STOP;
-	int err = i2c_transfer_dt(&config->i2c, &msgs[0], 1);
-	LOG_DBG("Test transaction went trough: %d", err);
+	if (prv_tsl2591_dummy_transfer(dev)) {
+		LOG_DBG("Test transaction failed!");
+	}
 
 	/* Read device ID */
 	uint8_t id;

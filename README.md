@@ -75,7 +75,7 @@ To install, modify your projects `west.yml` and add the following sections:
 
 Then run `west update` in your freshly created bash/command prompt session.
 
-Above command will clone `irnas-tsl2591-driver` repository inside of `ncs/irnas/`. You can now use the driver in your application projects.
+Above command will clone `irnas-tsl2591-driver` repository inside of `<project_root>/irnas`. You can now use the driver in your application projects.
 
 In your boards DTS file or overlay file, add tsl2591 device, under selected I2C peripheral. Example of overlay implementation can be found in samples folder.
 
