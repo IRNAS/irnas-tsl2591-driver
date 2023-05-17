@@ -2,7 +2,7 @@
 
 IRNAS Zephyr compatible implementation of `tsl2591` lux driver with `i2c` support.
 
-**IMPORTANT NOTE: for some reason first i2c transaction with sensor fails, hence we have a dummy rad inside init function that will fail. Ignore this message as init should go trough!**
+**IMPORTANT NOTE: for some reason first i2c transaction with sensor fails, hence we have a dummy read inside the init function that will fail. The error can be ignored.**
 
 Interrupt support is not yet supported in the driver!
 ## Setup
@@ -31,7 +31,7 @@ To build the application samples:
 
 ```bash
 cd samples/sample_name
-east build -b irnas-tsl2591-driver
+east build -b <board_name>
 ```
 
 To flash the firmware:
@@ -54,7 +54,7 @@ east util rtt
 
 This driver was written and tested for nrf-sdk v2.3.0
 
-To install, first modify `.../ncs/nrf/west.yml` and add the following sections:
+To install, modify your projects `west.yml` and add the following sections:
 
 1. In `remotes`, add the following if not already added:
 
