@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+### Fixed
+
+- disable sensor at the end of the init function
+
 ## [0.1.0] - 2023-05-17
 
 ### Added
