@@ -264,6 +264,9 @@ static int tsl2591_init(const struct device *dev)
 		return -EIO;
 	}
 
+	/* Power off */
+	prv_tsl2591_power_off(dev);
+
 	return 0;
 }
 
