@@ -174,6 +174,7 @@ static int tsl2591_sample_fetch(const struct device *dev, enum sensor_channel ch
 	if (i2c_burst_read_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN0_LOW, ch0,
 			      2)) {
 		LOG_ERR("Failed to read CH0 data.");
+		return -ENXIO;
 	}
 
 	data->chan0 = (ch0[1] << 8) + ch0[0];
@@ -183,6 +184,7 @@ static int tsl2591_sample_fetch(const struct device *dev, enum sensor_channel ch
 	if (i2c_burst_read_dt(&config->i2c, TSL2591_COMMAND_BIT | TSL2591_REGISTER_CHAN1_LOW, ch1,
 			      2)) {
 		LOG_ERR("Failed to read CH1 data.");
+		return -ENXIO;
 	}
 
 	data->chan1 = (ch1[1] << 8) + ch1[0];
